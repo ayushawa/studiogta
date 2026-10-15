@@ -1,55 +1,197 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { ArrowRight, X, MapPin, Tag, Eye } from 'lucide-react';
+import { ArrowRight, X, MapPin, Tag, Eye, CheckCircle2 } from 'lucide-react';
 import { PORTFOLIO_GALLERY } from '../data/siteData';
 import useScrollReveal from '../hooks/useScrollReveal';
+
+/**
+ * Accessible, Responsive Lightbox Modal for Portfolio Projects
+ * Rendered via createPortal directly into document.body to escape
+ * any transformed containing blocks or scroll boundaries.
+ */
+function PortfolioModal({ item, onClose, onOpenBooking }) {
+  const closeBtnRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
+  // Manage body scroll lock and focus management safely
+  useEffect(() => {
+    previousFocusRef.current = document.activeElement;
+
+    // Preserve original body inline styles
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+
+    // Calculate scrollbar width to prevent desktop layout shifts
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+    document.body.style.overflow = 'hidden';
+
+    // Keyboard listener for Escape dismissal
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Focus close button with preventScroll to ensure the viewport never jumps
+    const focusTimer = setTimeout(() => {
+      if (closeBtnRef.current) {
+        closeBtnRef.current.focus({ preventScroll: true });
+      }
+    }, 40);
+
+    return () => {
+      clearTimeout(focusTimer);
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+      window.removeEventListener('keydown', handleKeyDown);
+
+      // Restore focus to previously active element without scrolling
+      if (previousFocusRef.current && typeof previousFocusRef.current.focus === 'function') {
+        previousFocusRef.current.focus({ preventScroll: true });
+      }
+    };
+  }, [onClose]);
+
+  const handleBackdropClick = (e) => {
+    // Only close if user clicked directly on the backdrop element itself
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const handleBookingAction = (e) => {
+    onClose();
+    if (onOpenBooking) {
+      e.preventDefault();
+      onOpenBooking('hdr-photography');
+    }
+  };
+
+  return (
+    <div
+      className="portfolio-modal-backdrop"
+      onClick={handleBackdropClick}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="portfolio-modal-title"
+      aria-describedby="portfolio-modal-desc"
+    >
+      <div
+        className="portfolio-modal-dialog"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Floating Close Button */}
+        <button
+          ref={closeBtnRef}
+          type="button"
+          className="portfolio-modal-close"
+          onClick={onClose}
+          aria-label="Close project details"
+        >
+          <X size={20} aria-hidden="true" />
+        </button>
+
+        {/* Two-Column Desktop / Single-Column Mobile Case Study Layout */}
+        <div className="portfolio-modal-layout">
+          {/* Column 1: High-Definition Photography */}
+          <div className="portfolio-modal-image-col">
+            <div className="portfolio-modal-image-container">
+              <img
+                src={item.image}
+                alt={item.title}
+                className="portfolio-modal-img"
+              />
+            </div>
+          </div>
+
+          {/* Column 2: Project Details & Case Study Information */}
+          <div className="portfolio-modal-details-col">
+            <div className="portfolio-modal-details-scroll">
+              {/* Category & Location Badges */}
+              <div className="portfolio-modal-meta-row">
+                <span className="portfolio-modal-category-badge">
+                  <Tag size={12} aria-hidden="true" />
+                  <span>{item.category}</span>
+                </span>
+                {item.location && (
+                  <span className="portfolio-modal-location-badge">
+                    <MapPin size={13} className="icon-gold" aria-hidden="true" />
+                    <span>{item.location}</span>
+                  </span>
+                )}
+              </div>
+
+              {/* Project Title */}
+              <h2 id="portfolio-modal-title" className="portfolio-modal-title">
+                {item.title}
+              </h2>
+
+              {/* Property Overview */}
+              <div className="portfolio-modal-body-section">
+                <h3 className="portfolio-modal-section-label">Property Overview</h3>
+                <p id="portfolio-modal-desc" className="portfolio-modal-desc">
+                  {item.description}
+                </p>
+              </div>
+
+              {/* Studio GTA Quality Guarantee Highlights */}
+              <div className="portfolio-modal-highlights">
+                <div className="portfolio-modal-highlight-item">
+                  <CheckCircle2 size={15} className="icon-gold" aria-hidden="true" />
+                  <span>Next-Day 24-48h MLS Media Delivery</span>
+                </div>
+                <div className="portfolio-modal-highlight-item">
+                  <CheckCircle2 size={15} className="icon-gold" aria-hidden="true" />
+                  <span>High-Resolution Print & TRREB Ready Files</span>
+                </div>
+                <div className="portfolio-modal-highlight-item">
+                  <CheckCircle2 size={15} className="icon-gold" aria-hidden="true" />
+                  <span>Studio GTA 100% Satisfaction Guarantee</span>
+                </div>
+              </div>
+
+              {/* Action CTAs */}
+              <div className="portfolio-modal-actions">
+                <Link
+                  to="/packages"
+                  className="btn btn-gold portfolio-modal-book-cta"
+                  onClick={handleBookingAction}
+                >
+                  <span>Book Shoot For This Property</span>
+                  <ArrowRight size={16} aria-hidden="true" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="btn btn-secondary portfolio-modal-dismiss-btn"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Portfolio({ onOpenBooking }) {
   useScrollReveal();
   const [activeFilter, setActiveFilter] = useState('All');
   const [activeModalItem, setActiveModalItem] = useState(null);
 
-  const closeBtnRef = useRef(null);
-  const previousFocusRef = useRef(null);
-
   const categories = ['All', 'Residential', 'Architectural', 'Commercial'];
 
   const filteredItems = activeFilter === 'All'
     ? PORTFOLIO_GALLERY
     : PORTFOLIO_GALLERY.filter((item) => item.category === activeFilter);
-
-  // Body scroll lock, Escape key dismiss, and focus management for accessible modal
-  useEffect(() => {
-    if (activeModalItem) {
-      previousFocusRef.current = document.activeElement;
-      const originalOverflow = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
-
-      const handleKeyDown = (e) => {
-        if (e.key === 'Escape') {
-          setActiveModalItem(null);
-        }
-      };
-
-      window.addEventListener('keydown', handleKeyDown);
-
-      // Focus close button on open for accessibility
-      const focusTimer = setTimeout(() => {
-        if (closeBtnRef.current) {
-          closeBtnRef.current.focus();
-        }
-      }, 50);
-
-      return () => {
-        clearTimeout(focusTimer);
-        document.body.style.overflow = originalOverflow;
-        window.removeEventListener('keydown', handleKeyDown);
-        if (previousFocusRef.current && typeof previousFocusRef.current.focus === 'function') {
-          previousFocusRef.current.focus();
-        }
-      };
-    }
-  }, [activeModalItem]);
 
   const handleHeroBookClick = (e) => {
     if (onOpenBooking) {
@@ -58,18 +200,12 @@ export default function Portfolio({ onOpenBooking }) {
     }
   };
 
-  const handleModalBookClick = (e) => {
-    setActiveModalItem(null);
-    if (onOpenBooking) {
+  const handleOpenProject = (item, e) => {
+    if (e) {
       e.preventDefault();
-      onOpenBooking('hdr-photography');
+      e.stopPropagation();
     }
-  };
-
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      setActiveModalItem(null);
-    }
+    setActiveModalItem(item);
   };
 
   return (
@@ -138,13 +274,12 @@ export default function Portfolio({ onOpenBooking }) {
               <article key={item.id} className="portfolio-card">
                 <div
                   className="portfolio-card-media"
-                  onClick={() => setActiveModalItem(item)}
+                  onClick={(e) => handleOpenProject(item, e)}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setActiveModalItem(item);
+                      handleOpenProject(item, e);
                     }
                   }}
                   aria-label={`View photo of ${item.title}`}
@@ -183,7 +318,7 @@ export default function Portfolio({ onOpenBooking }) {
                     <button
                       type="button"
                       className="portfolio-explore-btn"
-                      onClick={() => setActiveModalItem(item)}
+                      onClick={(e) => handleOpenProject(item, e)}
                       aria-label={`Explore project: ${item.title}`}
                     >
                       <span>Explore Project</span>
@@ -197,80 +332,14 @@ export default function Portfolio({ onOpenBooking }) {
         </div>
       </section>
 
-      {/* RESPONSIVE ACCESSIBLE LIGHTBOX MODAL */}
-      {activeModalItem && (
-        <div
-          className="portfolio-lightbox-backdrop"
-          onClick={handleBackdropClick}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="portfolio-modal-title"
-          aria-describedby="portfolio-modal-desc"
-        >
-          <div
-            className="portfolio-lightbox-dialog"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              ref={closeBtnRef}
-              type="button"
-              className="portfolio-lightbox-close"
-              onClick={() => setActiveModalItem(null)}
-              aria-label="Close project preview"
-            >
-              <X size={20} />
-            </button>
-
-            <div className="portfolio-lightbox-image-wrap">
-              <img
-                src={activeModalItem.image}
-                alt={activeModalItem.title}
-                className="portfolio-lightbox-image"
-              />
-            </div>
-
-            <div className="portfolio-lightbox-content">
-              <div className="portfolio-lightbox-meta">
-                <span className="portfolio-lightbox-badge">
-                  <Tag size={12} aria-hidden="true" />
-                  <span>{activeModalItem.category}</span>
-                </span>
-                {activeModalItem.location && (
-                  <span className="portfolio-lightbox-location">
-                    <MapPin size={14} className="icon-gold" aria-hidden="true" />
-                    <span>{activeModalItem.location}</span>
-                  </span>
-                )}
-              </div>
-
-              <h2 id="portfolio-modal-title" className="portfolio-lightbox-title">
-                {activeModalItem.title}
-              </h2>
-
-              <p id="portfolio-modal-desc" className="portfolio-lightbox-desc">
-                {activeModalItem.description}
-              </p>
-
-              <div className="portfolio-lightbox-actions">
-                <Link
-                  to="/packages"
-                  className="btn btn-gold portfolio-lightbox-book-btn"
-                  onClick={handleModalBookClick}
-                >
-                  <span>Book Shoot For Your Listing</span>
-                  <ArrowRight size={16} aria-hidden="true" />
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setActiveModalItem(null)}
-                  className="btn btn-secondary portfolio-lightbox-cancel-btn"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* PORTAL-RENDERED RESPONSIVE TWO-COLUMN MODAL */}
+      {activeModalItem && typeof document !== 'undefined' && createPortal(
+        <PortfolioModal
+          item={activeModalItem}
+          onClose={() => setActiveModalItem(null)}
+          onOpenBooking={onOpenBooking}
+        />,
+        document.body
       )}
 
       {/* CLOSING CTA BANNER */}

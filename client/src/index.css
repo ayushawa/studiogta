@@ -2208,59 +2208,69 @@ button, input, textarea, select {
 }
 
 /* ==========================================================================
-   PORTFOLIO LIGHTBOX MODAL
+   PORTFOLIO MODAL (PORTAL OVERLAY & TWO-COLUMN CASE STUDY LAYOUT)
    ========================================================================== */
+.portfolio-modal-backdrop,
 .portfolio-lightbox-backdrop {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
   background-color: rgba(10, 8, 7, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  z-index: 1000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.5rem;
+  padding: 2rem clamp(1rem, 3vw, 2.5rem);
   overflow-y: auto;
-  animation: revealFade 0.25s ease forwards;
+  animation: revealFade 0.22s ease forwards;
 }
 
+.portfolio-modal-dialog,
 .portfolio-lightbox-dialog {
   background-color: var(--color-dark);
   color: var(--color-white);
   border-radius: var(--radius-md);
-  max-width: 900px;
+  max-width: 1100px;
   width: 100%;
-  max-height: 90vh;
+  max-height: calc(100vh - 4rem);
+  max-height: calc(100dvh - 4rem);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.12);
   position: relative;
-  animation: revealScale 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.75),
+              0 0 0 1px rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  animation: revealScale 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+/* Close button */
+.portfolio-modal-close,
 .portfolio-lightbox-close {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: rgba(15, 13, 12, 0.75);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  background: rgba(15, 13, 12, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #ffffff;
   border-radius: 50%;
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 10;
+  z-index: 20;
   transition: all var(--transition-fast);
 }
 
+.portfolio-modal-close:hover,
+.portfolio-modal-close:focus-visible,
 .portfolio-lightbox-close:hover,
 .portfolio-lightbox-close:focus-visible {
   background-color: var(--color-gold);
@@ -2269,45 +2279,81 @@ button, input, textarea, select {
   transform: rotate(90deg);
 }
 
+/* Two-column layout */
+.portfolio-modal-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  height: 100%;
+  max-height: inherit;
+  overflow: hidden;
+}
+
+/* Column 1: Image */
+.portfolio-modal-image-col,
 .portfolio-lightbox-image-wrap {
   background-color: #000000;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  max-height: 52vh;
-  min-height: 220px;
   position: relative;
+  min-height: 380px;
 }
 
+.portfolio-modal-image-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portfolio-modal-img,
 .portfolio-lightbox-image {
   width: 100%;
-  max-height: 52vh;
-  object-fit: contain;
+  height: 100%;
+  max-height: calc(100vh - 4rem);
+  max-height: calc(100dvh - 4rem);
+  object-fit: cover;
   display: block;
 }
 
-.portfolio-lightbox-content {
-  padding: 1.75rem 2rem;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+/* Column 2: Details */
+.portfolio-modal-details-col {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #161413;
 }
 
+.portfolio-modal-details-scroll,
+.portfolio-lightbox-content {
+  padding: 2.5rem 2.25rem;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.portfolio-modal-meta-row,
 .portfolio-lightbox-meta {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.85rem;
+  padding-right: 2.5rem;
 }
 
+.portfolio-modal-category-badge,
 .portfolio-lightbox-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   background-color: rgba(200, 169, 126, 0.18);
   color: var(--color-gold);
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 700;
   padding: 0.35rem 0.8rem;
   border-radius: var(--radius-sm);
@@ -2316,66 +2362,116 @@ button, input, textarea, select {
   letter-spacing: 0.08em;
 }
 
+.portfolio-modal-location-badge,
 .portfolio-lightbox-location {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.88rem;
+  gap: 0.35rem;
+  font-size: 0.85rem;
   color: #c9c3bb;
+  font-weight: 500;
 }
 
+.portfolio-modal-title,
 .portfolio-lightbox-title {
-  color: #ffffff;
   font-family: var(--font-serif);
-  font-size: 1.6rem;
-  font-weight: 600;
+  font-size: 1.65rem;
+  color: #ffffff;
   line-height: 1.3;
-  margin-bottom: 0.65rem;
+  margin-bottom: 1.25rem;
+  font-weight: 600;
 }
 
+.portfolio-modal-body-section {
+  margin-bottom: 1.5rem;
+}
+
+.portfolio-modal-section-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-gold);
+  margin-bottom: 0.5rem;
+}
+
+.portfolio-modal-desc,
 .portfolio-lightbox-desc {
   color: #d1cbc4;
   font-size: 0.95rem;
   line-height: 1.65;
-  margin-bottom: 1.5rem;
 }
 
-.portfolio-lightbox-actions {
+.portfolio-modal-highlights {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+  font-size: 0.84rem;
+  color: #b5afa7;
+}
+
+.portfolio-modal-highlight-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
+.highlight-bullet {
+  color: var(--color-gold);
+  font-size: 1rem;
+}
+
+.portfolio-modal-actions,
+.portfolio-lightbox-actions {
+  margin-top: auto;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.portfolio-modal-book-cta,
 .portfolio-lightbox-book-btn {
+  width: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 0.8rem 1.6rem;
+  padding: 0.85rem 1.5rem;
   font-size: 0.92rem;
-  min-height: 44px;
+  font-weight: 600;
+  min-height: 46px;
 }
 
+.portfolio-modal-dismiss-btn,
 .portfolio-lightbox-cancel-btn {
+  width: 100%;
+  background: transparent;
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.25);
-  background: transparent;
-  padding: 0.8rem 1.4rem;
-  font-size: 0.92rem;
-  min-height: 44px;
+  font-size: 0.88rem;
+  min-height: 42px;
   cursor: pointer;
   transition: all var(--transition-fast);
   border-radius: var(--radius-sm);
 }
 
+.portfolio-modal-dismiss-btn:hover,
+.portfolio-modal-dismiss-btn:focus-visible,
 .portfolio-lightbox-cancel-btn:hover,
 .portfolio-lightbox-cancel-btn:focus-visible {
-  border-color: var(--color-white);
   background-color: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  border-color: #ffffff;
 }
 
+/* ==========================================================================
+   PORTFOLIO RESPONSIVE BREAKPOINTS
+   ========================================================================== */
 /* ==========================================================================
    PORTFOLIO RESPONSIVE BREAKPOINTS
    ========================================================================== */
@@ -2385,6 +2481,33 @@ button, input, textarea, select {
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
+}
+
+@media (max-width: 960px) {
+  .portfolio-modal-layout {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+
+  .portfolio-modal-image-col,
+  .portfolio-lightbox-image-wrap {
+    min-height: 280px;
+    max-height: 42vh;
+  }
+
+  .portfolio-modal-img,
+  .portfolio-lightbox-image {
+    max-height: 42vh;
+    object-fit: cover;
+  }
+
+  .portfolio-modal-details-scroll,
+  .portfolio-lightbox-content {
+    padding: 1.75rem 1.5rem;
+    overflow-y: visible;
+  }
+
+  .portfolio-modal-title,
   .portfolio-lightbox-title {
     font-size: 1.4rem;
   }
@@ -2394,15 +2517,6 @@ button, input, textarea, select {
   .portfolio-filter-row {
     gap: 0.5rem;
     margin-bottom: 2rem;
-  }
-  .portfolio-lightbox-content {
-    padding: 1.4rem 1.5rem;
-  }
-  .portfolio-lightbox-image-wrap {
-    max-height: 45vh;
-  }
-  .portfolio-lightbox-image {
-    max-height: 45vh;
   }
 }
 
@@ -2417,44 +2531,69 @@ button, input, textarea, select {
     padding: 1.25rem;
   }
 
+  .portfolio-modal-backdrop,
   .portfolio-lightbox-backdrop {
-    padding: 0.75rem;
+    padding: 0.5rem;
   }
 
+  .portfolio-modal-dialog,
   .portfolio-lightbox-dialog {
-    max-height: 92dvh;
+    max-height: 94dvh;
     border-radius: var(--radius-sm);
   }
 
+  .portfolio-modal-image-col,
   .portfolio-lightbox-image-wrap {
-    max-height: 38vh;
-    min-height: 180px;
+    min-height: 220px;
+    max-height: 35vh;
   }
 
+  .portfolio-modal-img,
   .portfolio-lightbox-image {
-    max-height: 38vh;
+    max-height: 35vh;
   }
 
+  .portfolio-modal-details-scroll,
   .portfolio-lightbox-content {
     padding: 1.25rem 1rem;
   }
 
+  .portfolio-modal-title,
   .portfolio-lightbox-title {
     font-size: 1.25rem;
+    margin-bottom: 0.85rem;
   }
 
+  .portfolio-modal-desc,
   .portfolio-lightbox-desc {
     font-size: 0.9rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
   }
 
+  .portfolio-modal-highlights {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.8rem;
+  }
+
+  .portfolio-modal-close,
+  .portfolio-lightbox-close {
+    width: 38px;
+    height: 38px;
+    top: 0.65rem;
+    right: 0.65rem;
+  }
+
+  .portfolio-modal-actions,
   .portfolio-lightbox-actions {
     flex-direction: column;
     width: 100%;
     gap: 0.65rem;
   }
 
+  .portfolio-modal-book-cta,
   .portfolio-lightbox-book-btn,
+  .portfolio-modal-dismiss-btn,
   .portfolio-lightbox-cancel-btn {
     width: 100%;
     text-align: center;
@@ -2469,12 +2608,6 @@ button, input, textarea, select {
   }
   .portfolio-card-title {
     font-size: 1.15rem;
-  }
-  .portfolio-lightbox-close {
-    width: 38px;
-    height: 38px;
-    top: 0.6rem;
-    right: 0.6rem;
   }
 }
 
