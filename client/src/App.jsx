@@ -22,10 +22,10 @@ function MainRouter({ onOpenBooking }) {
   return (
     <div key={location.pathname} className="page-transition-wrap" style={{ minHeight: '100%' }}>
       <Routes location={location}>
-        <Route path="/" element={<Home onOpenBooking={() => onOpenBooking()} />} />
+        <Route path="/" element={<Home onOpenBooking={(pkgId) => onOpenBooking(pkgId)} />} />
         <Route path="/about" element={<About />} />
-        <Route path="/portfolio" element={<Portfolio onOpenBooking={() => onOpenBooking()} />} />
-        <Route path="/services" element={<Services onOpenBooking={() => onOpenBooking()} />} />
+        <Route path="/portfolio" element={<Portfolio onOpenBooking={(pkgId) => onOpenBooking(pkgId)} />} />
+        <Route path="/services" element={<Services onOpenBooking={(pkgId) => onOpenBooking(pkgId)} />} />
         
         {/* Package and Direct Booking Routes */}
         <Route path="/packages" element={<Packages onOpenBookingWithPackage={(pkgId) => onOpenBooking(pkgId)} />} />

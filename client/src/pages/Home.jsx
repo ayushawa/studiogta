@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Star, Clock, ChevronRight } from 'lucide-react';
-import { TRUST_STATS, SERVICES, TESTIMONIALS } from '../data/siteData';
+import { ArrowRight, Star, Clock, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { TRUST_STATS, SERVICES, TESTIMONIALS, PACKAGES } from '../data/siteData';
 import BrokerageLogoRow from '../components/BrokerageLogoRow';
 import useScrollReveal from '../hooks/useScrollReveal';
 
@@ -18,9 +18,17 @@ export default function Home({ onOpenBooking }) {
     }
   };
 
+  const handleBookPackage = (pkgId) => {
+    if (onOpenBooking) {
+      onOpenBooking(pkgId);
+    } else {
+      navigate(`/packages?package=${pkgId}`);
+    }
+  };
+
   return (
     <div className="home-page">
-      {/* SECTION 1: HERO */}
+      {/* 1. HERO SECTION */}
       <section className="hero-section" aria-label="Hero Section">
         <div className="container">
           <div className="hero-grid">
@@ -31,21 +39,21 @@ export default function Home({ onOpenBooking }) {
               </div>
 
               <h1 className="hero-headline">
-                Professional Real Estate Photography That Makes Every Property <span className="highlight-gold">Stand Out</span>.
+                Professional Real Estate Photography That Sells Properties <span className="highlight-gold">Faster</span>.
               </h1>
 
               <p className="hero-subtitle">
-                Showcase residential and commercial properties with professional photography, 4K walkthrough video, and visual marketing services from Studio GTA.
+                Showcase residential and commercial listings across the Greater Toronto Area with balanced HDR photography, 4K walkthrough video, and guaranteed next-day MLS delivery.
               </p>
 
               {/* Quick Hero Highlights */}
               <div className="hero-stats-strip">
                 <div className="hero-stat-item">
                   <Clock size={16} className="star-gold" />
-                  <span>24-Hour Turnaround</span>
+                  <span>24-Hour Delivery</span>
                 </div>
                 <div className="hero-stat-item">
-                  <Star size={16} className="star-gold" fill="#df9e29" />
+                  <Star size={16} className="star-gold" fill="#B59A65" color="#B59A65" />
                   <span>5.0 / 5 Star Google Reviews</span>
                 </div>
               </div>
@@ -61,7 +69,7 @@ export default function Home({ onOpenBooking }) {
                   <ArrowRight size={16} />
                 </button>
                 <Link to="/packages" className="btn btn-secondary">
-                  View Pricing
+                  View Packages
                 </Link>
               </div>
             </div>
@@ -80,13 +88,14 @@ export default function Home({ onOpenBooking }) {
                   <div className="hero-card-overlay">
                     <div className="hero-card-top">
                       <span className="hero-badge">Featured Shoot</span>
-                      <Link
-                        to="/contact"
+                      <button
+                        type="button"
+                        onClick={handleScheduleShoot}
                         className="btn btn-white"
                         style={{ padding: '0.45rem 1rem', fontSize: '0.82rem' }}
                       >
-                        Get Quote
-                      </Link>
+                        Book Now
+                      </button>
                     </div>
                     <div className="hero-card-bottom">
                       <div className="hero-card-location">Greater Toronto Area, Ontario</div>
@@ -100,7 +109,7 @@ export default function Home({ onOpenBooking }) {
         </div>
       </section>
 
-      {/* SECTION 2: QUICK TRUST STATISTICS */}
+      {/* 2. COMPACT TRUST INDICATORS */}
       <section className="stats-section" aria-label="Trust Statistics">
         <div className="container">
           <div className="stats-grid reveal-stagger">
@@ -118,7 +127,7 @@ export default function Home({ onOpenBooking }) {
         </div>
       </section>
 
-      {/* SECTION 3: FEATURED PORTFOLIO */}
+      {/* 3. FEATURED PORTFOLIO PHOTOGRAPHY */}
       <section className="featured-section" aria-label="Featured Portfolio Showcase">
         <div className="container">
           <div className="section-header reveal">
@@ -128,7 +137,7 @@ export default function Home({ onOpenBooking }) {
             </div>
             <h2>Editorial Real Estate & Architectural Imagery</h2>
             <p className="section-subtitle">
-              Every shoot is composed with an artistic eye for lighting, natural sightlines, and authentic architectural proportions.
+              Every shoot is composed with an artistic eye for natural sightlines, balanced daylight exposure, and accurate architectural volume.
             </p>
           </div>
 
@@ -148,21 +157,142 @@ export default function Home({ onOpenBooking }) {
               </div>
               <h3>Downtown Toronto Skyline Terrace Residence</h3>
               <p>
-                Over 1,100 sq ft of luxury interior design illuminated by floor-to-ceiling glass, opening onto a panoramic 400 sq ft wrap-around balcony with dramatic views of the Toronto skyline. Captured with multi-exposure HDR to maintain crisp outdoor detail while keeping interior tones warm and welcoming.
+                Over 1,100 sq ft of luxury interior design illuminated by floor-to-ceiling glass, opening onto a panoramic 400 sq ft wrap-around balcony overlooking the city. Captured with multi-exposure HDR to maintain crisp outdoor views while preserving warm, inviting interior ambience.
               </p>
-              <Link to="/portfolio" className="btn btn-primary">
-                View Full Portfolio
-                <ArrowRight size={16} />
-              </Link>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
+                <Link to="/portfolio" className="btn btn-primary">
+                  View Full Portfolio
+                  <ArrowRight size={16} />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => handleBookPackage('hdr-photography')}
+                  className="btn btn-secondary"
+                >
+                  Book This Style
+                </button>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* SECTION 4: TRUSTED BY REAL ESTATE PROFESSIONALS */}
+      {/* 4. CORE SERVICES OVERVIEW */}
+      <section className="services-preview-section" aria-label="Services Preview">
+        <div className="container">
+          <div className="section-header text-center reveal">
+            <div className="eyebrow">
+              <span className="eyebrow-dot" />
+              <span>Full-Service Visual Marketing</span>
+            </div>
+            <h2>Specialized Photography & Media Services</h2>
+            <p className="section-subtitle">
+              High-definition real estate media and cinematic walkthroughs elevate your listing above competing properties and attract qualified buyers.
+            </p>
+          </div>
+
+          <div className="services-cards-grid reveal-stagger">
+            {SERVICES.map((service) => (
+              <div key={service.id} className="service-preview-card reveal">
+                <div className="service-card-media">
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    loading="lazy"
+                    width="400"
+                    height="250"
+                  />
+                </div>
+                <div className="service-card-body">
+                  <div className="service-card-eyebrow">{service.eyebrow}</div>
+                  <h3 className="service-card-title">{service.title}</h3>
+                  <p className="service-card-desc">{service.description}</p>
+                  <Link to="/services" className="link-arrow">
+                    Learn Details & Inclusions <ChevronRight size={16} />
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. TRANSPARENT PACKAGES & PRICING INTRO */}
+      <section style={{ padding: 'var(--section-spacing) 0', backgroundColor: 'var(--color-linen)', borderTop: '1px solid var(--color-border-light)', borderBottom: '1px solid var(--color-border-light)' }}>
+        <div className="container">
+          <div className="section-header text-center reveal">
+            <div className="eyebrow">
+              <span className="eyebrow-dot" />
+              <span>Transparent Pricing</span>
+            </div>
+            <h2>All-Inclusive MLS Bundles</h2>
+            <p className="section-subtitle">
+              Every package includes high-resolution print files, MLS-ready compressed images, client portal delivery, and our guaranteed next-day turnaround.
+            </p>
+          </div>
+
+          <div className="pricing-grid reveal-stagger">
+            {PACKAGES.map((pkg) => (
+              <div
+                key={pkg.id}
+                className={`pricing-card ${pkg.recommended ? 'featured' : ''} reveal`}
+              >
+                {pkg.recommended && (
+                  <div className="pricing-badge">{pkg.badge}</div>
+                )}
+
+                <div className="pricing-header">
+                  <h3 className="pricing-name">{pkg.name}</h3>
+                  <div className="pricing-price-wrap">
+                    <span className="pricing-amount">{pkg.price}</span>
+                    <span className="pricing-currency">{pkg.currency}</span>
+                  </div>
+                  <div className="pricing-size-limit">{pkg.sizeLimit}</div>
+                </div>
+
+                <p className="pricing-desc">{pkg.description}</p>
+
+                <div className="pricing-inclusions-title">Package Inclusions:</div>
+                <ul className="pricing-features-list">
+                  {pkg.inclusions.slice(0, 5).map((inc, i) => (
+                    <li key={i} className="pricing-feature-item">
+                      <CheckCircle2 size={16} className="pricing-check-icon" />
+                      <span>{inc}</span>
+                    </li>
+                  ))}
+                  {pkg.inclusions.length > 5 && (
+                    <li className="pricing-feature-item" style={{ color: 'var(--color-muted)', fontSize: '0.85rem' }}>
+                      + {pkg.inclusions.length - 5} more inclusions...
+                    </li>
+                  )}
+                </ul>
+
+                <button
+                  type="button"
+                  onClick={() => handleBookPackage(pkg.id)}
+                  className={`btn ${pkg.recommended ? 'btn-gold' : 'btn-primary'} pricing-cta`}
+                  aria-label={`Book ${pkg.name}`}
+                >
+                  {pkg.ctaText}
+                  <ArrowRight size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '2.5rem' }} className="reveal">
+            <Link to="/packages" className="btn btn-secondary">
+              Compare Full Inclusions & Details
+              <ArrowRight size={16} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. VERIFIED BROKERAGE RELATIONSHIPS */}
       <BrokerageLogoRow />
 
-      {/* SECTION 5: WHY CHOOSE STUDIO GTA? */}
+      {/* 7. WHY CHOOSE STUDIO GTA */}
       <section className="benefits-section" aria-label="Why Choose Studio GTA">
         <div className="container">
           <div className="benefits-grid">
@@ -227,12 +357,12 @@ export default function Home({ onOpenBooking }) {
               </ul>
 
               <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                <Link to="/services" className="btn btn-primary">
-                  Explore Services
+                <Link to="/about" className="btn btn-primary">
+                  Our Story & Background
                   <ArrowRight size={16} />
                 </Link>
                 <Link to="/portfolio" className="btn btn-secondary">
-                  View Portfolio
+                  View Full Portfolio
                 </Link>
               </div>
             </div>
@@ -240,54 +370,7 @@ export default function Home({ onOpenBooking }) {
         </div>
       </section>
 
-      {/* SECTION 6: SERVICES PREVIEW */}
-      <section className="services-preview-section" aria-label="Services Preview">
-        <div className="container">
-          <div className="section-header text-center reveal">
-            <div className="eyebrow">
-              <span className="eyebrow-dot" />
-              <span>Full-Service Visual Marketing</span>
-            </div>
-            <h2>Specialized Photography & Media Services</h2>
-            <p className="section-subtitle">
-              Boring, flat pictures can cause you to lose potential buyers. High-definition real estate media and cinematic walkthroughs elevate your listing above competing properties.
-            </p>
-          </div>
-
-          <div className="services-cards-grid reveal-stagger">
-            {SERVICES.map((service) => (
-              <div key={service.id} className="service-preview-card reveal">
-                <div className="service-card-media">
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    loading="lazy"
-                    width="400"
-                    height="250"
-                  />
-                </div>
-                <div className="service-card-body">
-                  <div className="service-card-eyebrow">{service.eyebrow}</div>
-                  <h3 className="service-card-title">{service.title}</h3>
-                  <p className="service-card-desc">{service.description}</p>
-                  <Link to="/services" className="link-arrow">
-                    Learn Details & Inclusions <ChevronRight size={16} />
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: '3rem' }} className="reveal">
-            <Link to="/packages" className="btn btn-gold">
-              View Packages & Pricing
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* REALTOR TESTIMONIALS SECTION */}
+      {/* 8. REALTOR FEEDBACK / TESTIMONIALS */}
       <section style={{ padding: 'var(--section-spacing) 0', backgroundColor: 'var(--color-white)' }}>
         <div className="container">
           <div className="section-header text-center reveal">
@@ -305,7 +388,7 @@ export default function Home({ onOpenBooking }) {
                 className="reveal"
                 style={{
                   backgroundColor: 'var(--color-linen)',
-                  padding: '2.25rem 2rem',
+                  padding: '2rem 1.75rem',
                   borderRadius: 'var(--radius-md)',
                   border: '1px solid var(--color-border)',
                   display: 'flex',
@@ -317,12 +400,12 @@ export default function Home({ onOpenBooking }) {
                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
               >
                 <div>
-                  <div style={{ display: 'flex', gap: '0.2rem', color: '#df9e29', marginBottom: '1.25rem' }}>
+                  <div style={{ display: 'flex', gap: '0.2rem', color: 'var(--color-gold)', marginBottom: '1.25rem' }}>
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={16} fill="#df9e29" />
+                      <Star key={i} size={16} fill="var(--color-gold)" color="var(--color-gold)" />
                     ))}
                   </div>
-                  <p style={{ fontStyle: 'italic', color: 'var(--color-dark)', fontSize: '1.02rem', lineHeight: 1.7, marginBottom: '1.5rem' }}>
+                  <p style={{ fontStyle: 'italic', color: 'var(--color-dark)', fontSize: '1rem', lineHeight: 1.7, marginBottom: '1.5rem' }}>
                     "{t.quote}"
                   </p>
                 </div>
@@ -340,7 +423,7 @@ export default function Home({ onOpenBooking }) {
         </div>
       </section>
 
-      {/* SECTION 7: FINAL BOOKING CTA BANNER */}
+      {/* 9. FINAL BOOKING CTA BANNER */}
       <section className="cta-banner-section" aria-label="Book A Shoot Call To Action">
         <div className="container">
           <div className="cta-banner-inner reveal">
@@ -353,10 +436,14 @@ export default function Home({ onOpenBooking }) {
               Tell us about your property and the photography services you need. Next-day delivery, flawless exposure, and dedicated service across the Greater Toronto Area.
             </p>
             <div className="cta-banner-actions">
-              <Link to="/packages" className="btn btn-gold">
-                Book Now
+              <button
+                type="button"
+                onClick={handleScheduleShoot}
+                className="btn btn-gold"
+              >
+                Schedule Shoot Now
                 <ArrowRight size={16} />
-              </Link>
+              </button>
               <Link to="/contact" className="btn btn-secondary" style={{ color: 'var(--color-white)', borderColor: 'rgba(255,255,255,0.25)' }}>
                 Contact Us
               </Link>

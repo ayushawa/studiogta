@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { PACKAGES } from '../data/siteData';
 
@@ -34,6 +35,30 @@ export default function BookingModal({ isOpen, onClose, initialPackageId = '' })
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const successTimerRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
+  // Manage body scroll lock and focus restoration safely
+  useEffect(() => {
+    if (!isOpen) return;
+
+    previousFocusRef.current = document.activeElement;
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
+      if (previousFocusRef.current && typeof previousFocusRef.current.focus === 'function') {
+        previousFocusRef.current.focus({ preventScroll: true });
+      }
+    };
+  }, [isOpen]);
 
   // Clear timer when component unmounts
   useEffect(() => {
@@ -65,6 +90,7 @@ export default function BookingModal({ isOpen, onClose, initialPackageId = '' })
   }, [isOpen, handleClose]);
 
   if (!isOpen) return null;
+  if (typeof document === 'undefined') return null;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -146,7 +172,7 @@ export default function BookingModal({ isOpen, onClose, initialPackageId = '' })
     }
   };
 
-  return (
+  return createPortal(
     <div className="modal-backdrop" onClick={handleClose} role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
       <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
         <button
@@ -401,6 +427,7 @@ export default function BookingModal({ isOpen, onClose, initialPackageId = '' })
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

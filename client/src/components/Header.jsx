@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { Menu, X, Calendar, ArrowRight } from 'lucide-react';
 import { COMPANY } from '../data/siteData';
@@ -12,6 +12,26 @@ export default function Header({ onOpenBooking }) {
   const { isVisible, isScrolled } = useScrollNavbar(mobileMenuOpen);
 
   const closeMenu = () => setMobileMenuOpen(false);
+
+  // Lock body scroll and handle Escape key while mobile menu is open
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeMenu();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [mobileMenuOpen]);
 
   const handleCheckAvailability = (e) => {
     e.preventDefault();
@@ -114,7 +134,12 @@ export default function Header({ onOpenBooking }) {
       />
 
       {/* Mobile Navigation Drawer */}
-      <aside className={`mobile-nav-drawer ${mobileMenuOpen ? 'open' : ''}`} aria-label="Mobile Navigation">
+      <aside
+        className={`mobile-nav-drawer ${mobileMenuOpen ? 'open' : ''}`}
+        aria-label="Mobile Navigation"
+        role="dialog"
+        aria-modal="true"
+      >
         <div>
           <div className="mobile-drawer-header">
             <img
