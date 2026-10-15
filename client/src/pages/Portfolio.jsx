@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, X, Maximize2, MapPin, Tag } from 'lucide-react';
+import { ArrowRight, X, MapPin, Tag, Eye } from 'lucide-react';
 import { PORTFOLIO_GALLERY } from '../data/siteData';
 import useScrollReveal from '../hooks/useScrollReveal';
 
@@ -9,16 +9,66 @@ export default function Portfolio({ onOpenBooking }) {
   const [activeFilter, setActiveFilter] = useState('All');
   const [activeModalItem, setActiveModalItem] = useState(null);
 
+  const closeBtnRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
   const categories = ['All', 'Residential', 'Architectural', 'Commercial'];
 
   const filteredItems = activeFilter === 'All'
     ? PORTFOLIO_GALLERY
     : PORTFOLIO_GALLERY.filter((item) => item.category === activeFilter);
 
-  const handleBookClick = (e) => {
+  // Body scroll lock, Escape key dismiss, and focus management for accessible modal
+  useEffect(() => {
+    if (activeModalItem) {
+      previousFocusRef.current = document.activeElement;
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape') {
+          setActiveModalItem(null);
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+
+      // Focus close button on open for accessibility
+      const focusTimer = setTimeout(() => {
+        if (closeBtnRef.current) {
+          closeBtnRef.current.focus();
+        }
+      }, 50);
+
+      return () => {
+        clearTimeout(focusTimer);
+        document.body.style.overflow = originalOverflow;
+        window.removeEventListener('keydown', handleKeyDown);
+        if (previousFocusRef.current && typeof previousFocusRef.current.focus === 'function') {
+          previousFocusRef.current.focus();
+        }
+      };
+    }
+  }, [activeModalItem]);
+
+  const handleHeroBookClick = (e) => {
     if (onOpenBooking) {
       e.preventDefault();
       onOpenBooking();
+    }
+  };
+
+  const handleModalBookClick = (e) => {
+    setActiveModalItem(null);
+    if (onOpenBooking) {
+      e.preventDefault();
+      onOpenBooking('hdr-photography');
+    }
+  };
+
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setActiveModalItem(null);
     }
   };
 
@@ -48,12 +98,12 @@ export default function Portfolio({ onOpenBooking }) {
                 href="#portfolio-gallery"
                 className="btn btn-gold"
               >
-                Explore Gallery
-                <ArrowRight size={16} />
+                <span>Explore Gallery</span>
+                <ArrowRight size={16} aria-hidden="true" />
               </a>
               <Link
                 to="/packages"
-                onClick={handleBookClick}
+                onClick={handleHeroBookClick}
                 className="btn btn-white"
               >
                 Book a Shoot
@@ -67,7 +117,7 @@ export default function Portfolio({ onOpenBooking }) {
       <section id="portfolio-gallery" style={{ padding: 'var(--section-spacing) 0', backgroundColor: 'var(--color-white)' }}>
         <div className="container">
           {/* Category Filter */}
-          <div className="portfolio-filter-row reveal" role="tablist" aria-label="Filter portfolio items">
+          <div className="portfolio-filter-row reveal" role="tablist" aria-label="Filter portfolio projects">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -82,123 +132,138 @@ export default function Portfolio({ onOpenBooking }) {
             ))}
           </div>
 
-          {/* Masonry / Responsive Grid */}
-          <div className="portfolio-masonry-grid reveal">
+          {/* Responsive 3-Col / 2-Col / 1-Col Project Grid */}
+          <div className="portfolio-gallery-grid reveal">
             {filteredItems.map((item) => (
-              <div
-                key={item.id}
-                className="portfolio-item-card"
-                onClick={() => setActiveModalItem(item)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setActiveModalItem(item);
-                  }
-                }}
-                aria-label={`View photo of ${item.title}`}
-              >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  loading="lazy"
-                  width="400"
-                  height="300"
-                />
-                <div className="portfolio-item-overlay">
-                  <div className="portfolio-overlay-cat">{item.category} • {item.location}</div>
-                  <div className="portfolio-overlay-title">{item.title}</div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--color-gold)' }}>
-                    <Maximize2 size={14} /> Click to expand
+              <article key={item.id} className="portfolio-card">
+                <div
+                  className="portfolio-card-media"
+                  onClick={() => setActiveModalItem(item)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setActiveModalItem(item);
+                    }
+                  }}
+                  aria-label={`View photo of ${item.title}`}
+                >
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    loading="lazy"
+                    width="600"
+                    height="400"
+                  />
+                  <span className="portfolio-card-badge">{item.category}</span>
+                  <div className="portfolio-card-media-overlay" aria-hidden="true">
+                    <span className="portfolio-card-quick-view">
+                      <Eye size={15} />
+                      <span>View Full Size</span>
+                    </span>
                   </div>
                 </div>
-              </div>
+
+                <div className="portfolio-card-body">
+                  {item.location && (
+                    <div className="portfolio-card-location">
+                      <MapPin size={13} className="icon-gold" aria-hidden="true" />
+                      <span>{item.location}</span>
+                    </div>
+                  )}
+
+                  <h2 className="portfolio-card-title">{item.title}</h2>
+
+                  {item.description && (
+                    <p className="portfolio-card-desc">{item.description}</p>
+                  )}
+
+                  <div className="portfolio-card-footer">
+                    <button
+                      type="button"
+                      className="portfolio-explore-btn"
+                      onClick={() => setActiveModalItem(item)}
+                      aria-label={`Explore project: ${item.title}`}
+                    >
+                      <span>Explore Project</span>
+                      <ArrowRight size={15} aria-hidden="true" />
+                    </button>
+                  </div>
+                </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* LIGHTBOX MODAL */}
+      {/* RESPONSIVE ACCESSIBLE LIGHTBOX MODAL */}
       {activeModalItem && (
         <div
-          className="modal-backdrop"
-          onClick={() => setActiveModalItem(null)}
+          className="portfolio-lightbox-backdrop"
+          onClick={handleBackdropClick}
           role="dialog"
           aria-modal="true"
-          aria-label="Image Lightbox Preview"
+          aria-labelledby="portfolio-modal-title"
+          aria-describedby="portfolio-modal-desc"
         >
           <div
-            className="modal-dialog"
-            style={{
-              backgroundColor: 'var(--color-dark)',
-              color: 'var(--color-white)',
-              borderRadius: 'var(--radius-md)',
-              maxWidth: '920px',
-              width: '100%',
-              overflow: 'hidden',
-              boxShadow: '0 25px 60px rgba(0,0,0,0.5)',
-              position: 'relative'
-            }}
+            className="portfolio-lightbox-dialog"
             onClick={(e) => e.stopPropagation()}
           >
             <button
+              ref={closeBtnRef}
               type="button"
+              className="portfolio-lightbox-close"
               onClick={() => setActiveModalItem(null)}
-              style={{
-                position: 'absolute',
-                top: '1rem',
-                right: '1rem',
-                background: 'rgba(0,0,0,0.6)',
-                border: 'none',
-                color: '#ffffff',
-                borderRadius: '50%',
-                width: '36px',
-                height: '36px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                zIndex: 10
-              }}
-              aria-label="Close lightbox"
+              aria-label="Close project preview"
             >
               <X size={20} />
             </button>
 
-            <div style={{ maxHeight: '65vh', overflow: 'hidden', backgroundColor: '#000000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="portfolio-lightbox-image-wrap">
               <img
                 src={activeModalItem.image}
                 alt={activeModalItem.title}
-                style={{ width: '100%', maxHeight: '65vh', objectFit: 'contain' }}
+                className="portfolio-lightbox-image"
               />
             </div>
 
-            <div style={{ padding: '1.75rem 2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-                <span className="modal-selected-pill" style={{ margin: 0 }}>
-                  <Tag size={12} /> {activeModalItem.category}
+            <div className="portfolio-lightbox-content">
+              <div className="portfolio-lightbox-meta">
+                <span className="portfolio-lightbox-badge">
+                  <Tag size={12} aria-hidden="true" />
+                  <span>{activeModalItem.category}</span>
                 </span>
-                <span style={{ fontSize: '0.85rem', color: '#a8a29e', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <MapPin size={14} className="icon-gold" /> {activeModalItem.location}
-                </span>
+                {activeModalItem.location && (
+                  <span className="portfolio-lightbox-location">
+                    <MapPin size={14} className="icon-gold" aria-hidden="true" />
+                    <span>{activeModalItem.location}</span>
+                  </span>
+                )}
               </div>
-              <h3 style={{ color: '#ffffff', fontSize: '1.5rem', marginBottom: '0.5rem' }}>
+
+              <h2 id="portfolio-modal-title" className="portfolio-lightbox-title">
                 {activeModalItem.title}
-              </h3>
-              <p style={{ color: '#c9c3bb', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.25rem' }}>
+              </h2>
+
+              <p id="portfolio-modal-desc" className="portfolio-lightbox-desc">
                 {activeModalItem.description}
               </p>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <Link to="/packages" className="btn btn-gold" onClick={() => setActiveModalItem(null)}>
-                  Book Shoot For Your Listing
-                  <ArrowRight size={16} />
+
+              <div className="portfolio-lightbox-actions">
+                <Link
+                  to="/packages"
+                  className="btn btn-gold portfolio-lightbox-book-btn"
+                  onClick={handleModalBookClick}
+                >
+                  <span>Book Shoot For Your Listing</span>
+                  <ArrowRight size={16} aria-hidden="true" />
                 </Link>
                 <button
                   type="button"
                   onClick={() => setActiveModalItem(null)}
-                  className="btn btn-secondary"
-                  style={{ color: '#ffffff', borderColor: 'rgba(255,255,255,0.2)' }}
+                  className="btn btn-secondary portfolio-lightbox-cancel-btn"
                 >
                   Close
                 </button>
@@ -218,8 +283,8 @@ export default function Portfolio({ onOpenBooking }) {
             </p>
             <div className="cta-banner-actions">
               <Link to="/packages" className="btn btn-gold">
-                View Pricing & Book Shoot
-                <ArrowRight size={16} />
+                <span>View Pricing & Book Shoot</span>
+                <ArrowRight size={16} aria-hidden="true" />
               </Link>
               <Link to="/contact" className="btn btn-secondary" style={{ color: 'var(--color-white)', borderColor: 'rgba(255,255,255,0.25)' }}>
                 Request Custom Quote
