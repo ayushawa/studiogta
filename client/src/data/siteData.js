@@ -7,8 +7,13 @@ export const COMPANY = {
   phone: '647-300-0315',
   phoneClean: '+16473000315',
   email: 'info@studiogta.ca',
-  bookingEmail: 'tour@studiogta.ca',
-  address: '15 Heritage Road Unit 24, Markham, ON, Canada',
+  address: '3601 Highway 7 East, Suite 1005, Unit D08, Markham ON L3R 0M3',
+  addressLines: [
+    '3601 Highway 7 East, Suite 1005, Unit D08,',
+    'Markham ON',
+    'L3R 0M3'
+  ],
+  mapUrl: 'https://maps.google.com/?q=3601+Highway+7+East,+Suite+1005,+Unit+D08,+Markham+ON+L3R+0M3',
   serviceArea: 'Greater Toronto Area & Surrounding Regions',
   hours: 'Monday – Saturday: 8:00 AM – 7:00 PM',
   instagram: 'https://www.instagram.com/studiogta_realestatemedia',

@@ -1588,6 +1588,34 @@ button, input, textarea, select {
   color: var(--color-gold);
 }
 
+.footer-address-link {
+  display: flex;
+  flex-direction: column;
+  color: #d6d0c7;
+  text-decoration: none;
+  line-height: 1.5;
+  transition: color var(--transition-fast);
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.footer-address-link:hover {
+  color: var(--color-gold);
+}
+
+.footer-address-link .address-line {
+  display: block;
+  white-space: normal;
+}
+
+.contact-address-link {
+  transition: color var(--transition-fast);
+}
+
+.contact-address-link:hover {
+  color: var(--color-gold) !important;
+}
+
 .footer-bottom-bar {
   padding-top: 2rem;
   border-top: 1px solid rgba(255, 255, 255, 0.08);

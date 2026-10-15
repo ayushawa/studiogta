@@ -31,10 +31,37 @@ if (isResendConfigured) {
   console.log('[RESEND SERVICE] Local preview mode active (Inquiries logged to server console).');
 }
 
+// Allowed origins for CORS: production Vercel frontend, configured CLIENT_URL, and local dev environments
+const allowedOrigins = [
+  'https://studiogta.vercel.app',
+  CLIENT_URL,
+  CLIENT_URL ? CLIENT_URL.replace(/\/+$/, '') : null,
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  'http://localhost:5174',
+  'http://127.0.0.1:5174',
+  'http://localhost:3000'
+].filter(Boolean);
+
 // CORS setup
 app.use(cors({
-  origin: [CLIENT_URL, 'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:5174', 'http://127.0.0.1:5174'],
-  methods: ['GET', 'POST'],
+  origin: function (origin, callback) {
+    // Allow non-browser / server-to-server / health check requests
+    if (!origin) return callback(null, true);
+
+    const normalizedOrigin = origin.replace(/\/+$/, '');
+    const isAllowed =
+      allowedOrigins.some(allowed => allowed.replace(/\/+$/, '') === normalizedOrigin) ||
+      /^https:\/\/studiogta(-[a-z0-9-]+)?\.vercel\.app$/.test(normalizedOrigin);
+
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 

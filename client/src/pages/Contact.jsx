@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Phone, Mail, MapPin, Clock, CheckCircle, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
 import { COMPANY } from '../data/siteData';
+import { API_BASE_URL } from '../api/client';
 import useScrollReveal from '../hooks/useScrollReveal';
 
 export default function Contact() {
@@ -65,8 +66,7 @@ export default function Contact() {
     setLoading(true);
 
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || '';
-      const res = await fetch(`${API_BASE}/api/contact`, {
+      const res = await fetch(`${API_BASE_URL}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -229,14 +229,23 @@ export default function Contact() {
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.85rem' }}>
-                    <MapPin size={18} className="icon-gold" style={{ marginTop: '0.2rem' }} />
+                    <MapPin size={18} className="icon-gold" style={{ marginTop: '0.2rem', flexShrink: 0 }} />
                     <div>
                       <div style={{ fontSize: '0.78rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--color-muted)', fontWeight: 700 }}>
                         Studio Office Address
                       </div>
-                      <span style={{ fontSize: '0.95rem', color: 'var(--color-stone)' }}>
-                        {COMPANY.address}
-                      </span>
+                      <a
+                        href={COMPANY.mapUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="contact-address-link"
+                        style={{ fontSize: '0.95rem', color: 'var(--color-stone)', textDecoration: 'none', display: 'flex', flexDirection: 'column', lineHeight: 1.45 }}
+                        aria-label="Studio GTA office address in Google Maps (opens in new tab)"
+                      >
+                        {(COMPANY.addressLines || [COMPANY.address]).map((line, index) => (
+                          <span key={index}>{line}</span>
+                        ))}
+                      </a>
                     </div>
                   </div>
 

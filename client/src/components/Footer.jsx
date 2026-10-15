@@ -103,7 +103,17 @@ export default function Footer() {
               </li>
               <li className="footer-contact-item">
                 <MapPin size={16} className="icon" />
-                <span>{COMPANY.address}</span>
+                <a
+                  href={COMPANY.mapUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="footer-address-link"
+                  aria-label="Studio GTA office address in Google Maps (opens in new tab)"
+                >
+                  {(COMPANY.addressLines || [COMPANY.address]).map((line, index) => (
+                    <span key={index} className="address-line">{line}</span>
+                  ))}
+                </a>
               </li>
               <li className="footer-contact-item">
                 <Clock size={16} className="icon" />

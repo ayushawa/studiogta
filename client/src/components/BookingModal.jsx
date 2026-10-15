@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { PACKAGES } from '../data/siteData';
+import { API_BASE_URL } from '../api/client';
 
 export default function BookingModal({ isOpen, onClose, initialPackageId = '' }) {
   const resolvePackage = (pkgId) => {
@@ -132,8 +133,7 @@ export default function BookingModal({ isOpen, onClose, initialPackageId = '' })
     setLoading(true);
 
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || '';
-      const res = await fetch(`${API_BASE}/api/book-package`, {
+      const res = await fetch(`${API_BASE_URL}/api/book-package`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
