@@ -323,12 +323,20 @@ button, input, textarea, select {
   flex-wrap: wrap;
 }
 
+.top-bar-trust {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 .top-bar-item {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   color: #e4ded7;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .top-bar-item a {
@@ -340,12 +348,20 @@ button, input, textarea, select {
   color: var(--color-gold);
 }
 
+.top-bar-separator {
+  color: rgba(255, 255, 255, 0.2);
+  user-select: none;
+  font-size: 0.6rem;
+  line-height: 1;
+}
+
 .top-bar-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   color: #b5afa7;
   font-size: 0.8rem;
+  white-space: nowrap;
 }
 
 .top-bar-badge .icon-gold {
@@ -358,6 +374,7 @@ button, input, textarea, select {
   gap: 1.25rem;
 }
 
+/* --- Mobile top-bar: tablet & below --- */
 @media (max-width: 820px) {
   .top-bar-right .hide-mobile {
     display: none;
@@ -365,7 +382,16 @@ button, input, textarea, select {
   .top-bar-inner {
     justify-content: center;
     text-align: center;
-    min-height: 36px;
+    min-height: 34px;
+    gap: 0.35rem;
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+  }
+  .top-bar-contact {
+    gap: 0.5rem;
+  }
+  .top-bar-trust {
+    gap: 0.5rem;
   }
 }
 
@@ -525,6 +551,17 @@ button, input, textarea, select {
   cursor: pointer;
   padding: 0.5rem;
   color: var(--color-dark);
+  border-radius: var(--radius-sm);
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.mobile-toggle:hover {
+  background-color: var(--color-linen);
+  color: var(--color-gold-deep);
 }
 
 /* Mobile Drawer */
@@ -537,30 +574,31 @@ button, input, textarea, select {
     display: none;
   }
   .mobile-toggle {
-    display: block;
+    display: flex;
   }
   .navbar {
-    height: 72px;
+    height: 64px;
   }
   .brand-logo-img {
-    height: 40px;
+    height: 38px;
   }
   .mobile-nav-drawer {
-    display: block;
+    display: flex;
     position: fixed;
     top: 0;
     right: 0;
-    width: 300px;
+    width: min(300px, 85vw);
     height: 100vh;
     background-color: var(--color-white);
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.15);
     z-index: 200;
     padding: 2rem 1.75rem;
     transform: translateX(100%);
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-    display: flex;
+    transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     flex-direction: column;
     justify-content: space-between;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .mobile-nav-drawer.open {
     transform: translateX(0);
@@ -2619,22 +2657,53 @@ button, input, textarea, select {
     width: 100%;
   }
 
-  /* Top Bar */
+  /* Top Bar — compact two-row layout */
+  .top-bar {
+    font-size: 0.76rem;
+  }
+
   .top-bar-inner {
     flex-direction: column;
-    padding: 0.5rem 0;
-    gap: 0.35rem;
+    padding: 0.35rem 0;
+    gap: 0.25rem;
+    align-items: center;
   }
 
   .top-bar-contact {
-    flex-direction: column;
-    gap: 0.25rem;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
     align-items: center;
-    font-size: 0.78rem;
+    font-size: 0.76rem;
+  }
+
+  .top-bar-trust {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.65rem;
+    justify-content: center;
   }
 
   .top-bar-badge {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
+    gap: 0.3rem;
+  }
+
+  .top-bar-badge .trust-text {
+    white-space: nowrap;
+  }
+
+  .top-bar-separator {
+    font-size: 0.5rem;
+  }
+
+  /* Navbar — tighter on small phones */
+  .navbar {
+    height: 56px;
+  }
+
+  .brand-logo-img {
+    height: 34px;
   }
 
   /* Hero Section */
@@ -2703,7 +2772,18 @@ button, input, textarea, select {
   }
 }
 
-/* Extra Small Mobile (320px) */
+/* Small Mobile (380px) */
+@media (max-width: 380px) {
+  .top-bar-trust .top-bar-separator {
+    display: none;
+  }
+
+  .top-bar-trust {
+    gap: 0.2rem 0.5rem;
+  }
+}
+
+/* Extra Small Mobile (320px - 340px) */
 @media (max-width: 340px) {
   .hero-headline {
     font-size: 1.75rem;
@@ -2712,6 +2792,33 @@ button, input, textarea, select {
   .btn {
     padding: 0.75rem 1.25rem;
     font-size: 0.88rem;
+  }
+
+  /* Top bar: ultra-compact */
+  .top-bar {
+    font-size: 0.72rem;
+  }
+
+  .top-bar-contact {
+    gap: 0.35rem;
+    font-size: 0.72rem;
+  }
+
+  .top-bar-trust {
+    gap: 0.15rem 0.4rem;
+  }
+
+  .top-bar-badge {
+    font-size: 0.70rem;
+    gap: 0.25rem;
+  }
+
+  .navbar {
+    height: 52px;
+  }
+
+  .brand-logo-img {
+    height: 30px;
   }
 }
 
